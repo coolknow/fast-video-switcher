@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head> 
+<meta charset="utf-8"> 
+<title>VPlayer</title> 
+<!-- 新 Bootstrap 核心 CSS 文件 -->
+<link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+var index = 1;
+function myFunction(value){
+  index = value;
+  console.log(index);
+  var src = $("#videoSrc"+value).html();
+  $("#player").prop("src",src);
+};
+function next(){
+  index = index + 1;
+  console.log(index);
+  var src = srcList[index];
+  $("#player").prop("src",src);
+  if(index === srcList.length-1){
+    document.getElementById("next").disabled = true;
+  }
+  if(index > 0){
+    document.getElementById("prev").disabled = false;
+  }
+};
+function prev(){
+  index = index - 1;
+  console.log(index);
+  var src = srcList[index];
+  $("#player").prop("src",src);
+  if(index === 0){
+    document.getElementById("prev").disabled = true;
+  }
+  if(index < srcList.length-1){
+    document.getElementById("next").disabled = false;
+  }
+};
+var srcList = [];
+$(document).ready(function(){
+  $('#showList').click(function(){
+    $('#videoList').fadeToggle();
+  });
+  // $("#test").click(function(){
+  $.ajax({
+      method: "get",
+      url: 'http://localhost:8081/list',
+      dataType: "jsonp",
+      jsonpCallback: "getData",     //ajax底层 自动执行该回调函数，return出后台返回的数据
+      success: function (res) {
+          console.log(res.addr);
+          srcList = res.addr;
+          var src = srcList[index];
+          $("#player").prop("src",src);
+          var list = document.getElementById("videoList");
+          for (var i = 0; i < srcList.length; i++) {
+            var item = document.createElement("a");
+            item.innerHTML = '<a href="#" class="list-group-item list-group-item-action" id="videoSrc' + i + '" onclick="myFunction(' + i + ')" >' + srcList[i] + '</a>';
+            list.appendChild(item);
+          }
+      },
+      error: function (err) {
+          console.log(err);
+      },
+      timeout: 2000
+  });
+});
+</script>
+</head>
+<body>
+
+<div style="display: flex">
+  <div style="flex: 1; display: flex; align-items: center; justify-content: center">
+    <button id="prev" onclick="prev()" type="button" class="btn btn-info">上一个</button>
+  </div>
+  <div style="flex: 3; display: flex; align-items: center; justify-content: center">
+    <video id="player" width="800" height="600" controls>
+      <source id="mp4_src" src=""  type="video/mp4">
+    </video>
+  </div>
+  <div style="flex: 1; display: flex; align-items: center; justify-content: center">
+    <button id="next" onclick="next()" type="button" class="btn btn-info">下一个</button>
+  </div>
+</div>
+
+<button id="showList" type="button" name="button">列表</button>
+
+<div class="list-group" id="videoList">
+
+</div>
+
+</body>
+</html>
