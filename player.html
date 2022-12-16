@@ -18,6 +18,12 @@ function myFunction(value){
   console.log(index);
   var src = $("#videoSrc"+value).html();
   $("#player").prop("src",src);
+  if(index > 0){
+    document.getElementById("prev").disabled = false;
+  }
+  if(index < srcList.length-1){
+    document.getElementById("next").disabled = false;
+  }
 };
 function next(){
   index = index + 1;
