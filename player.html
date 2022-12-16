@@ -44,6 +44,7 @@ function prev(){
   }
 };
 var srcList = [];
+var srcTimes = [];
 $(document).ready(function(){
   $('#showList').click(function(){
     $('#videoList').fadeToggle();
@@ -57,9 +58,22 @@ $(document).ready(function(){
       success: function (res) {
           console.log(res.addr);
           srcList = res.addr;
+          srcTimes = res.time;
           var src = srcList[index];
           $("#player").prop("src",src);
           var list = document.getElementById("videoList");
+          for (let i = 0; i < srcTimes.length - 1; i++) {
+            for (let j = 0; j < srcTimes.length - i - 1; j++) {
+              if (srcTimes[j] < srcTimes[j + 1]) {
+                var temp1 = srcTimes[j];
+                srcTimes[j] = srcTimes[j + 1];
+                srcTimes[j + 1] = temp1;
+                var temp2 = srcList[j];
+                srcList[j] = srcList[j + 1];
+                srcList[j + 1] = temp2;
+              }
+            }
+          }
           for (var i = 0; i < srcList.length; i++) {
             var item = document.createElement("a");
             item.innerHTML = '<a href="#" class="list-group-item list-group-item-action" id="videoSrc' + i + '" onclick="myFunction(' + i + ')" >' + srcList[i] + '</a>';
