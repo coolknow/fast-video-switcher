@@ -12,7 +12,7 @@
 <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
 <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script>
-var index = 1;
+var index = 0;
 function myFunction(value){
   index = value;
   console.log(index);
@@ -59,8 +59,6 @@ $(document).ready(function(){
           console.log(res.addr);
           srcList = res.addr;
           srcTimes = res.time;
-          var src = srcList[index];
-          $("#player").prop("src",src);
           var list = document.getElementById("videoList");
           for (let i = 0; i < srcTimes.length - 1; i++) {
             for (let j = 0; j < srcTimes.length - i - 1; j++) {
@@ -78,6 +76,14 @@ $(document).ready(function(){
             var item = document.createElement("a");
             item.innerHTML = '<a href="#" class="list-group-item list-group-item-action" id="videoSrc' + i + '" onclick="myFunction(' + i + ')" >' + srcList[i] + '</a>';
             list.appendChild(item);
+          }
+          var src = srcList[index];
+          $("#player").prop("src",src);
+          if(index === 0){
+            document.getElementById("prev").disabled = true;
+          }
+          if(index === srcList.length-1){
+            document.getElementById("next").disabled = false;
           }
       },
       error: function (err) {
