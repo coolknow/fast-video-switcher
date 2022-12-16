@@ -3,44 +3,32 @@ var fs = require('fs');
 var path = require('path');
 var app = express();
 
-var walk = function(dir, done) {
-  var results = [];
-  fs.readdir(dir, function(err, list) {
-    if (err) return done(err);
-    var pending = list.length;
-    if (!pending) return done(null, results);
-    list.forEach(function(file) {
-      file = path.resolve(dir, file);
-      fs.stat(file, function(err, stat) {
-        if (stat && stat.isDirectory()) {
-          walk(file, function(err, res) {
-            results = results.concat(res);
-            if (!--pending) done(null, results);
-          });
-        } else {
-          results.push(file);
-          if (!--pending) done(null, results);
-        }
-      });
-    });
-  });
-};
-
-var filtered_results = [];
-
-walk(__dirname, function(err, results) {
-  if (err) throw err;
-  for (var i=0;i<results.length;i++){
-    var string = results[i];
-    var stringlength = string.length;
-    if(string.substring(stringlength-4, stringlength) === ".mp4"){
-      filtered_results.push(results[i].substring(27,));
-    }
-  }
-});
-
 var pointer = 0;
 
+var filtered_results = [];
+var filtered_results_addtime = [];
+
+function getAllFilePaths(dir) {
+  const filePaths = [];
+  const files = fs.readdirSync(dir);
+  for (const file of files) {
+    const filePath = path.join(dir, file);
+    const fileStat = fs.statSync(filePath);
+    if (fileStat.isDirectory()) {
+      // 如果是子目录，递归调用 getAllFilePaths 函数
+      filePaths.push(...getAllFilePaths(filePath));
+    } else {
+      // 否则，将文件路径添加到结果数组中
+      filePaths.push(filePath);
+    }
+  }
+  return filePaths;
+}
+
+function getFileCreationTime(filePath) {
+  const stats = fs.statSync(filePath);
+  return stats.birthtime;
+}
 
 // app.use((req, res, next) => {
 //     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -53,9 +41,21 @@ app.get('/', function (req, res) {
 })
 
 app.get('/list', function (req, res) {
+  const filePaths = getAllFilePaths(__dirname);
+  for (var i=0;i<filePaths.length;i++){
+    var string = filePaths[i];
+    var stringlength = string.length;
+    if(string.substring(stringlength-4, stringlength) === ".mp4"){
+      if (filtered_results.indexOf(filePaths[i].substring(27,)) === -1) {
+        filtered_results.push(filePaths[i].substring(27,));
+        filtered_results_addtime.push(getFileCreationTime(filePaths[i]));
+      }
+    }
+  }
+  // console.log(filtered_results);
   pointer = pointer + 1;
   let callback = req.query.callback;
-  let data = { addr: filtered_results};
+  let data = { addr: filtered_results, time:filtered_results_addtime };
   console.log("页面加载"+pointer);
   res.send(callback + '(' + JSON.stringify(data) + ')');
 })
