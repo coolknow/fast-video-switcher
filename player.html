@@ -97,18 +97,57 @@ $(document).ready(function(){
 <body>
 
 <div style="display: flex">
-  <div style="flex: 1; display: flex; align-items: center; justify-content: center">
+  <div style="flex: 2; display: flex; align-items: center; justify-content: center">
     <button id="prev" onclick="prev()" type="button" class="btn btn-info">上一个</button>
   </div>
   <div style="flex: 3; display: flex; align-items: center; justify-content: center">
-    <video id="player" width="800" height="600" controls>
+    <video id="player" width="600" height="400" controls>
       <source id="mp4_src" src=""  type="video/mp4">
     </video>
   </div>
-  <div style="flex: 1; display: flex; align-items: center; justify-content: center">
+  <div style="flex: 2; display: flex; align-items: center; justify-content: center">
+    <!-- 创建一个竖直方向的滑块 -->
+    <input type="range" min="0.1" max="7" step="0.1" value="2" id="playbackRateRange" class="vertical">
+  </div>
+  <div style="flex: 2; display: flex; align-items: center; justify-content: center">
     <button id="next" onclick="next()" type="button" class="btn btn-info">下一个</button>
   </div>
 </div>
+
+<style>
+  /* 使用 CSS 将滑块转换为竖直方向 */
+  .vertical {
+    /* 设置滑块的高度为 300 像素，宽度为 50 像素 */
+    width: 50px;
+    height: 300px;
+
+    /* 将滑块的滑块部分翻转 90 度 */
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
+
+    /* 将滑块的文本标签也翻转 90 度，以便其显示正常 */
+    writing-mode: bt-lr;
+
+    /* 将滑块的轨道设置为左侧，以便滑块在竖直方向上移动 */
+    direction: rtl;
+  }
+</style>
+
+<!-- 使用 JavaScript 监听滑块的更改事件 -->
+<script>
+  // 获取视频和滑块元素
+  const video = document.getElementById('player');
+  const range = document.getElementById('playbackRateRange');
+
+  // 监听滑块的更改事件
+  range.addEventListener('input', function() {
+    // 将视频的播放速度设置为滑块的值
+    video.playbackRate = this.value;
+  });
+</script>
 
 <button id="showList" type="button" name="button">列表</button>
 
